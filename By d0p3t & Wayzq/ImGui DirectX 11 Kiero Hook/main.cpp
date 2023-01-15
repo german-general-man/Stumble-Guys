@@ -1,20 +1,5 @@
-﻿#include "includes.h"
-
-#include <windows.h>
-#include <vector>
+#include "includes.h"
 #include <string>
-#include <thread>
-#include <stdio.h>
-#include <lmcons.h>
-#include <iostream>
-#include <filesystem>
-#include <fstream>
-#include <wchar.h>
-#include <tchar.h>
-#include <random>
-#include <sstream>
-#include <ShlObj.h>
-#include <functional>
 #include "font_awesome.cpp"
 
 
@@ -109,50 +94,54 @@ bool __stdcall HasFootstep_h(DWORD* __this, const char* footstepID, DWORD* metho
 	return true;
 }
 
+void CreateHook()
+{
+	MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasSkinOffset), &HasSkin_h, (LPVOID*)&has_skin_o);
+	MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasEmoteOffset), &HasEmote_h, (LPVOID*)&has_emote_o);
+	MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasAnimationOffset), &HasAnimation_h, (LPVOID*)&has_animation_o);
+	MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasFootstepOffset), &HasFootstep_h, (LPVOID*)&has_footstep_o);
+}
+
 void feature()
 {
 	if (HasSkin)
 	{
 		// Skin
-		MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasSkinOffset), &HasSkin_h, (LPVOID*)&has_skin_o);
-		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasSkinOffset));
+		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasSkinOffset)) == MH_OK;
 	}
 	else
 	{
-		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasSkinOffset));
+		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasSkinOffset)) != MH_OK;
 	}
 
 	if (HasEmote)
 	{
 		// Emote
-		MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasEmoteOffset), &HasEmote_h, (LPVOID*)&has_emote_o);
-		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasEmoteOffset));
+		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasEmoteOffset)) == MH_OK;
 	}
 	else
 	{
-		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasEmoteOffset));
+		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasEmoteOffset)) != MH_OK;
 	}
 
 	if (HasAnimation)
 	{
 		// Animation
-		MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasAnimationOffset), &HasAnimation_h, (LPVOID*)&has_animation_o);
-		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasAnimationOffset));
+		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasAnimationOffset)) == MH_OK;
 	}
 	else
 	{
-		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasAnimationOffset));
+		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasAnimationOffset)) != MH_OK;
 	}
 
 	if (HasFootstep)
 	{
 		// Footstep
-		MH_CreateHook(reinterpret_cast<LPVOID*>(GameAssembly + HasFootstepOffset), &HasFootstep_h, (LPVOID*)&has_footstep_o);
-		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasFootstepOffset));
+		MH_EnableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasFootstepOffset)) == MH_OK;
 	}
 	else
 	{
-		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasFootstepOffset));
+		MH_DisableHook(reinterpret_cast<LPVOID*>(GameAssembly + HasFootstepOffset)) != MH_OK;
 	}
 }
 static char buffer[9999999];
@@ -187,10 +176,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::GetMouseCursor();
-	ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-	ImGui::GetIO().WantCaptureMouse = showui;
-	ImGui::GetIO().MouseDrawCursor = showui;
+	CreateHook();
+	feature();
 
 	if (showui)
 	{
@@ -200,9 +187,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Checkbox("Unlock Emotes", &HasEmote);
 			ImGui::Checkbox("Unlock Animations", &HasAnimation);
 			ImGui::Checkbox("Unlock Footsteps", &HasFootstep);
-			ImGui::EndTabBar();
+			ImGui::End();
 		}
-		ImGui::End();
 	}
 
 	ImGui::Render();
@@ -214,6 +200,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
+
+	if (MH_Initialize() != MH_OK)
+	{
+		MessageBoxA(0, "Couldn't initialize MinHook!", "MinHook Fatal Error", MB_ICONERROR);
+		return -1;
+	}
+
 	bool init_hook = false;
 	do
 	{
