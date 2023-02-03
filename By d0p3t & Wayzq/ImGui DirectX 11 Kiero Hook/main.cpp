@@ -61,10 +61,10 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 uintptr_t base = (uintptr_t)GetModuleHandle(NULL);
 uintptr_t GameAssembly = (uintptr_t)GetModuleHandle("GameAssembly.dll");
-uintptr_t HasSkinOffset = 0x12F0DA0;
-uintptr_t HasEmoteOffset = 0x12F0C00;
-uintptr_t HasAnimationOffset = 0x12F0AD0;
-uintptr_t HasFootstepOffset = 0x12F0D10;
+uintptr_t HasSkinOffset = 0x376460;
+uintptr_t HasEmoteOffset = 0x3762C0;
+uintptr_t HasAnimationOffset = 0x376190;
+uintptr_t HasFootstepOffset = 0x3763D0;
 
 bool(__fastcall* has_skin_o)(DWORD*, const char*, DWORD*);
 bool __stdcall HasSkin_h(DWORD* __this, const char* skinID, DWORD* method)
