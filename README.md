@@ -2,7 +2,9 @@
 
 ### Frequently Asked Questions
 #### How did you obtain the files used for this work?
-> You just need to build the ImGui-Project, then it should work!\n
+> You just need to build the ImGui-Project, then it should work!
+
+#### Discord-Tag 
 > My Discord-Tag: Juan.#8888
 
 # Ingame 
